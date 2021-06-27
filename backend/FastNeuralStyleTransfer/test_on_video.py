@@ -1,4 +1,4 @@
-from models import TransformerNet
+from FastNeuralStyleTransfer.models import TransformerNet
 from utils import *
 import torch
 from torch.autograd import Variable

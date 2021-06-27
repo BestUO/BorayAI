@@ -1,2 +1,2 @@
-import sys
-sys.path.append("PytorchWCT")
+# import sys
+# sys.path.append("PytorchWCT")

@@ -41,7 +41,7 @@ public:
     bool ResponseClient(std::string resultdirpath, std::string message)
     {
         //"/home/uncle_orange/mydevice/BorayAI/data/backend/"
-        //"e9dd99a3517f4312947feada2d982d00_20210404/192168001007-e9dd99a3517f4312947feada2d982d00-result.jpg"
+        //"e9dd99a3517f4312947feada2d982d00_20210404/TextTpSpeech/192168001007-e9dd99a3517f4312947feada2d982d00-result.jpg"
         LOG(INFO) << "recv message from kafka:" << message;
         std::unique_lock<std::mutex> lck(_mutex);
         std::string uuid(message.substr(0,32));
@@ -65,10 +65,16 @@ public:
             // iter->second->get_res().set_status_and_content(cinatra::status_type::ok, "OK");
 
             iter->second->response_now();
+            LOG(INFO) << "uuid:" << uuid << " response message to client " << message;
             _mapcon.erase(iter);
             return true;
         }
-        return false;
+        else
+        {
+            LOG(INFO) << "cant find uuid:" << uuid;
+            return false;
+        }
+
     }
 private:
     // int _max_thread_num = std::thread::hardware_concurrency();

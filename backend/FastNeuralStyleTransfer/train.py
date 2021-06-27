@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.utils import save_image
 from torchvision import models
-from models import TransformerNet, VGG16
+from FastNeuralStyleTransfer.models import TransformerNet, VGG16
 from utils import *
 import matplotlib.pyplot as plt
 import time

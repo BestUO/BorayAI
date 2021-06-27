@@ -30,6 +30,7 @@ void HttpServer::__AddURL()
 {
     __URL_StyleTransfer_WCT_AdaIN();
     __URL_StyleTransfer_Fast();
+    __URL_TextToSpeech_Fixed();
 }
 
 void HttpServer::__AddMultiPartBegin(cinatra::request& req,std::string &name)
@@ -38,16 +39,18 @@ void HttpServer::__AddMultiPartBegin(cinatra::request& req,std::string &name)
     {
         auto tt = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         struct tm* ptm = localtime(&tt);
-        char date[16] = { 0 };
+        char date[20] = { 0 };
         sprintf(date, "%d%02d%02d/", (int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday);
         std::string dirpath = this->__middlewaredirpath + std::string(date);
-	    bool flag = std::filesystem::create_directories(dirpath);
+	    std::filesystem::create_directories(dirpath);
         return std::string(date);
     };
     std::string dayname = create_dir();
     if(__Begin_StyleTransfer_WCT_AdaIN(req, name, dayname))
         return;
     if(__Begin_StyleTransfer_Fast(req, name, dayname))
+        return;
+    if(__Begin_TextToSpeech_Fixed(req, name, dayname))
         return;
     __Begin_StyleTransfer_Node(req, name, dayname);
 }
@@ -85,6 +88,17 @@ bool HttpServer::__Begin_StyleTransfer_Fast(cinatra::request& req,std::string &n
     return false;
 }
 
+bool HttpServer::__Begin_TextToSpeech_Fixed(cinatra::request& req,std::string &name,std::string &dayname)
+{
+    if(req.get_url() == "/TextToSpeech/Fixed")
+    {
+        if(req.get_uuid().empty())
+            req.set_uuid(RWSeparate<cinatra::http_server::type>::inst().GetUUID());
+        return true;
+    }
+    return false;
+}
+
 bool HttpServer::__Begin_StyleTransfer_Node(cinatra::request& req,std::string &name,std::string &dayname)
 {
     name = dayname + __topic + "-" + req.get_uuid() + "-content.jpg_ing";
@@ -95,6 +109,7 @@ void HttpServer::__URL_StyleTransfer_WCT_AdaIN()
 {
     auto fun = [this](cinatra::request& req, cinatra::response& res) 
     {
+        LOG(INFO) << "request " << req.get_uuid() << " already recved files";
         if(req.get_upload_files().size() != 2 || req.get_multipart_value_by_key1("modelname").empty() || 
                 req.get_multipart_value_by_key1("alpha").empty())
         {
@@ -126,7 +141,7 @@ void HttpServer::__URL_StyleTransfer_WCT_AdaIN()
         RWSeparate<cinatra::http_server::type>::inst().Add2Map(con, req.get_uuid());
         SimpleWrapKafka::inst().Add2Kafka(modelname, message);
         
-        LOG(INFO) << "recv images and ready to add kafka:" << message;
+        LOG(INFO) << "request " << req.get_uuid() << " already add kafka:" << message;
     };
     __server.set_http_handler<cinatra::GET, cinatra::POST>("/StyleTransfer/WCTAdaIN", fun);
 }
@@ -135,6 +150,7 @@ void HttpServer::__URL_StyleTransfer_Fast()
 {
     auto fun = [this](cinatra::request& req, cinatra::response& res) 
     {
+        LOG(INFO) << "request " << req.get_uuid() << " already recved files";
         if(req.get_upload_files().size() != 1 || req.get_multipart_value_by_key1("modelname").empty() || 
                 req.get_multipart_value_by_key1("stylename").empty())
         {
@@ -161,7 +177,36 @@ void HttpServer::__URL_StyleTransfer_Fast()
         RWSeparate<cinatra::http_server::type>::inst().Add2Map(con, req.get_uuid());
         SimpleWrapKafka::inst().Add2Kafka(modelname, message);
         
-        LOG(INFO) << "recv images and ready to add kafka:" << message;
+        LOG(INFO) << "request " << req.get_uuid() << " already add kafka:" << message;
     };
     __server.set_http_handler<cinatra::GET, cinatra::POST>("/StyleTransfer/Fast", fun);
+}
+
+void HttpServer::__URL_TextToSpeech_Fixed()
+{
+    auto fun = [this](cinatra::request& req, cinatra::response& res) 
+    {
+        if(req.get_uuid().empty())
+            req.set_uuid(RWSeparate<cinatra::http_server::type>::inst().GetUUID());
+        LOG(INFO) << "request " << req.get_uuid() << " already recved files";
+        auto fun = [](cinatra::request& req)
+        {
+            //TextToSpeech_1234566_have a good day:en:0_192168001007
+            return req.get_multipart_value_by_key1("text")+ ":" + 
+                    req.get_multipart_value_by_key1("language") + ":" +
+                    req.get_multipart_value_by_key1("speakerid");
+        };
+        res.set_delay(true);
+        // res.set_status_and_content(cinatra::status_type::ok, "multipart finished");
+
+        std::string modelname = req.get_multipart_value_by_key1("modelname");
+        std::string message = fun(req);
+        message = modelname + "_" + req.get_uuid() + "_" + message + "_" + this->__topic;
+        auto con = req.get_conn<cinatra::http_server::type>();
+        RWSeparate<cinatra::http_server::type>::inst().Add2Map(con, req.get_uuid());
+        SimpleWrapKafka::inst().Add2Kafka(modelname, message);
+        
+        LOG(INFO) << "request " << req.get_uuid() << " already add kafka:" << message;
+    };
+    __server.set_http_handler<cinatra::GET, cinatra::POST>("/TextToSpeech/Fixed", fun);
 }

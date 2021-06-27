@@ -3,9 +3,11 @@ import json
 import PytorchWCT.stwct as stwct
 import PytorchAdaIN.stadain as stadain
 import FastNeuralStyleTransfer.stfast as stfast
+import TextToSpeech.tts as tts
 import time
 import os
 import myglobal
+from pathlib import Path
 
 class ModelInterface(ABC):
 
@@ -33,10 +35,13 @@ class ModelInterface(ABC):
         pass
 
     def MKDIRByDay(self):
-        dirpath = self.conf_json["ResultDirPath"] + time.strftime("%Y%m%d", time.localtime())
-        if not os.path.exists(dirpath):
-            os.makedirs(dirpath)
-        return dirpath + "/"
+        # dirpath = self.conf_json["ResultDirPath"] + time.strftime("%Y%m%d", time.localtime())
+        # if not os.path.exists(dirpath):
+        #     os.makedirs(dirpath)
+        # return dirpath + "/"
+        dirpath = Path(self.conf_json["ResultDirPath"]).joinpath(time.strftime("%Y%m%d", time.localtime()),self.name)
+        os.makedirs(dirpath, exist_ok=True)
+        return dirpath
 
 
 class StyleTransferWCT(ModelInterface):
@@ -64,7 +69,7 @@ class StyleTransferWCT(ModelInterface):
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [resultpath + param.topic+"-"+param.uuid+"-result.jpg"]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.jpg"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -101,7 +106,7 @@ class StyleTransferAdaIN(ModelInterface):
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [resultpath + param.topic+"-"+param.uuid+"-result.jpg"]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.jpg"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -138,7 +143,7 @@ class StyleTransferFast(ModelInterface):
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [resultpath + param.topic+"-"+param.uuid+"-result.jpg"]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.jpg"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -149,6 +154,40 @@ class StyleTransferFast(ModelInterface):
             result += [[p[0][0], p[0][1] + "_" + p[1][2][len(self.conf_json["ResultDirPath"]):]]]
         return result
 
+class FastSpeech(ModelInterface):
+
+    def __init__(self, name="TextToSpeech"):
+        super(FastSpeech, self).__init__(name)
+        self.config = self._Parseconfig(self.conf_json[name])
+        self.model = self._GetModel(self.usegpu)
+
+    def _GetModel(self, usegpu):
+        return tts.GetModel(self.config, usegpu)
+
+    def _Parseconfig(self, json):
+        return json
+
+    def _ParseParams(self, params):
+        def parsemodelparams(modelparams):
+            text, modelname, speakerid = modelparams.split(":")
+            modelpath = self.config[modelname]
+            return [text, modelpath, int(speakerid), modelname]
+
+        resultpath = self.MKDIRByDay()
+        p1 = []
+        p2 = []
+        for param in params:
+            p1 += [[param.topic, param.uuid]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.wav"))]]
+        return p1, p2
+
+    def Eval(self, params):
+        p1, p2 = self._ParseParams(params)
+        tts.Eval(self.usegpu, self.model, p2)
+        result = []
+        for p in zip(p1, p2):
+            result += [[p[0][0], p[0][1] + "_" + p[1][4][len(self.conf_json["ResultDirPath"]):]]]
+        return result
 
 class StyleTransferNone(ModelInterface):
 

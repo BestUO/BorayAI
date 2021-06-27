@@ -2,7 +2,8 @@
     "FunctionTopic":[
         "StyleTransfer-WCT",
         "StyleTransfer-AdaIN",
-        "StyleTransfer-Fast"
+        "StyleTransfer-Fast",
+        "TextToSpeech"
     ],
     "MiddlewareTopic":[
         "192168001007"
@@ -10,42 +11,47 @@
     "bootstrap.servers":[
         "192.168.1.7:9092"
     ],
-    "middlewarelogpath":"/home/uncle_orange/mydevice/BorayAI/logs/middleware/",
-    "backendlogpath":"/home/uncle_orange/mydevice/BorayAI/logs/backend/",
+    "middlewarelogpath":"/home/uncleorange/mydevice/BorayAI/logs/middleware/",
+    "backendlogpath":"/home/uncleorange/mydevice/BorayAI/logs/backend/",
     "Port":"7086",
     "GroupID":"g1",
     "BatchSize":16,
     "//":"must end by '/'",
-    "MiddlewareDirPath":"/home/uncle_orange/mydevice/BorayAI/data/middleware/",
+    "MiddlewareDirPath":"/home/uncleorange/mydevice/BorayAI/data/middleware/",
     "//":"must end by '/'",
-    "ResultDirPath":"/home/uncle_orange/mydevice/BorayAI/data/backend/",
+    "ResultDirPath":"/home/uncleorange/mydevice/BorayAI/data/backend/",
     "UseGPU":true,
     "ContentSize":512,
     "StyleSize":512,
     "StyleTransfer-WCT":
     {
-        "vgg1":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv1_1.pth",
-        "vgg2":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv2_1.pth",
-        "vgg3":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv3_1.pth",
-        "vgg4":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv4_1.pth",
-        "vgg5":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv5_1.pth",
-        "decoder1":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv1_1.pth",
-        "decoder2":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv2_1.pth",
-        "decoder3":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv3_1.pth",
-        "decoder4":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv4_1.pth",
-        "decoder5":"/home/uncle_orange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv5_1.pth"
+        "vgg1":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv1_1.pth",
+        "vgg2":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv2_1.pth",
+        "vgg3":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv3_1.pth",
+        "vgg4":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv4_1.pth",
+        "vgg5":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_vgg_normalised_conv5_1.pth",
+        "decoder1":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv1_1.pth",
+        "decoder2":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv2_1.pth",
+        "decoder3":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv3_1.pth",
+        "decoder4":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv4_1.pth",
+        "decoder5":"/home/uncleorange/mydevice/BorayAI/backend/models/wctmodels/wct_feature_invertor_conv5_1.pth"
     },
     "StyleTransfer-AdaIN":
     {
-        "adain_vgg":"/home/uncle_orange/mydevice/BorayAI/backend/models/adainmodels/adain_vgg.pth",
-        "adain_decoder":"/home/uncle_orange/mydevice/BorayAI/backend/models/adainmodels/adain_decoder.pth"
+        "adain_vgg":"/home/uncleorange/mydevice/BorayAI/backend/models/adainmodels/adain_vgg.pth",
+        "adain_decoder":"/home/uncleorange/mydevice/BorayAI/backend/models/adainmodels/adain_decoder.pth"
     },
     "StyleTransfer-Fast":
     {
-        "faststyle1":"/home/uncle_orange/mydevice/BorayAI/backend/models/fnst/faststyle1.pth",
-        "faststyle2":"/home/uncle_orange/mydevice/BorayAI/backend/models/fnst/faststyle2.pth",
-        "faststyle3":"/home/uncle_orange/mydevice/BorayAI/backend/models/fnst/faststyle3.pth",
-        "faststyle4":"/home/uncle_orange/mydevice/BorayAI/backend/models/fnst/faststyle4.pth",
-        "faststyle5":"/home/uncle_orange/mydevice/BorayAI/backend/models/fnst/faststyle5.pth"
+        "faststyle1":"/home/uncleorange/mydevice/BorayAI/backend/models/fnst/faststyle1.pth",
+        "faststyle2":"/home/uncleorange/mydevice/BorayAI/backend/models/fnst/faststyle2.pth",
+        "faststyle3":"/home/uncleorange/mydevice/BorayAI/backend/models/fnst/faststyle3.pth",
+        "faststyle4":"/home/uncleorange/mydevice/BorayAI/backend/models/fnst/faststyle4.pth",
+        "faststyle5":"/home/uncleorange/mydevice/BorayAI/backend/models/fnst/faststyle5.pth"
+    },
+    "TextToSpeech":
+    {
+        "en":["/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/LJSpeech.pth.tar","/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/generator_LJSpeech.pth.tar"],
+        "zh":["/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/aishell3.pth.tar","/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/generator_universal.pth.tar"]
     }
 }

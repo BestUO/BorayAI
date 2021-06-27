@@ -192,7 +192,8 @@ int main()
     FLAGS_logbufsecs=5;
     google::InitGoogleLogging("BorayAI_Middleware.log");
     LOG(INFO) << "start middleware";
-
+    LOG(INFO) << "topic:" << topic << "brokers" << brokers << "groupid" << groupid << "middlewaredirpath" << middlewaredirpath << 
+            "resultdirpath" << resultdirpath << "port"<< port << "middlewarelogpath" << middlewarelogpath;
     // ttt();
     
     SimpleWrapKafka::inst().CreateProducer(brokers);

@@ -39,19 +39,16 @@ def main():
     """
     # kafka.PutMessage(
     #     "StyleTransfer-WCT",
-    #     "StyleTransfer-WCT_1234567_20210402/192168001007-1234567-content.jpg:20210402/192168001007-1234567-style.jpg:0.8_192168001007")
-    # kafka.PutMessage(
-    #     "StyleTransfer-WCT",
-    #     "StyleTransfer-WCT_1234568_20210402/192168001007-1234568-content.jpg:20210402/192168001007-1234568-style.jpg:0.8_192168001007")
-    # kafka.PutMessage(
-    #     "StyleTransfer-AdaIN",
-    #     "StyleTransfer-AdaIN_1234569_20210402/192168001007-1234569-content.jpg:20210402/192168001007-1234569-style.jpg:0.8_192168001007")
+    #     "StyleTransfer-WCT_1234568_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
     # kafka.PutMessage(
     #     "StyleTransfer-AdaIN",
     #     "StyleTransfer-AdaIN_1234566_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
-    kafka.PutMessage(
-        "StyleTransfer-Fast",
-        "StyleTransfer-Fast_1234566_20210402/192168001007-1234566-content.jpg:faststyle1_192168001007")
+    # kafka.PutMessage(
+    #     "StyleTransfer-Fast",
+    #     "StyleTransfer-Fast_1234566_20210402/192168001007-1234566-content.jpg:faststyle2_192168001007")
+    # kafka.PutMessage(
+    #     "TextToSpeech",
+    #     "TextToSpeech_1234566_have a good day:en:0_192168001007")
 
     p = process.Process()
     kafka.GetMessage(p.DealWithMessage, conf_json["BatchSize"])

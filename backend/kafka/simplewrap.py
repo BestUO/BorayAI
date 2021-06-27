@@ -48,7 +48,9 @@ class SimpleWrapKafka:
                     messages += [msg.value().decode('utf-8')]
                     batch -= 1
             if len(messages):
+                myglobal.get_logger().info("recv " + str(len(messages)) + " messages:" + str(messages))
                 res = cbfun(messages)
+                myglobal.get_logger().info("Done with model")
                 for topic, message in res:
                     self.PutMessage(topic, message)
                     myglobal.get_logger().info("send message:"+message)

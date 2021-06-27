@@ -1,10 +1,10 @@
-import net as adainnet
+import PytorchAdaIN.net as adainnet
 import torch
 import torch.nn as nn
 from torchvision import transforms
 from PIL import Image
 from torchvision.utils import save_image
-from function import adaptive_instance_normalization
+from PytorchAdaIN.function import adaptive_instance_normalization
 
 
 def GetModel(config):
@@ -21,8 +21,7 @@ def Eval(usegpu, model, contentsize, stylesize, params):
     with torch.no_grad():
         device = torch.device(
             "cuda" if usegpu and torch.cuda.is_available() else "cpu")
-        vgg = model[0]
-        decoder = model[1]
+        vgg, decoder = model
         vgg.to(device)
         vgg.eval()
         decoder.to(device)

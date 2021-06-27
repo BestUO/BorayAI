@@ -1,5 +1,5 @@
 # from models import TransformerNet
-from models import TransformerNet
+from FastNeuralStyleTransfer.models import TransformerNet
 from pathlib import Path
 from utils import style_transform, denormalize
 import torch

@@ -1,4 +1,4 @@
-from util import WCT
+from .util import WCT
 import torch
 from torchvision import transforms
 from torchvision.utils import save_image

@@ -18,9 +18,11 @@ class HttpServer
         void __AddURL();
         void __URL_StyleTransfer_WCT_AdaIN();
         void __URL_StyleTransfer_Fast();
+        void __URL_TextToSpeech_Fixed();
 
         void __AddMultiPartBegin(cinatra::request& req,std::string &name);
         bool __Begin_StyleTransfer_WCT_AdaIN(cinatra::request& req,std::string &name,std::string &dayname);
         bool __Begin_StyleTransfer_Fast(cinatra::request& req,std::string &name,std::string &dayname);
+        bool __Begin_TextToSpeech_Fixed(cinatra::request& req,std::string &name,std::string &dayname);
         bool __Begin_StyleTransfer_Node(cinatra::request& req,std::string &name,std::string &dayname);
 };

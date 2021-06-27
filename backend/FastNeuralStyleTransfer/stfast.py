@@ -1,4 +1,4 @@
-from models import TransformerNet
+from FastNeuralStyleTransfer.models import TransformerNet
 import torch
 from torchvision import transforms
 from torchvision.utils import save_image
@@ -8,12 +8,14 @@ import numpy as np
 
 mean = np.array([0.485, 0.456, 0.406])
 std = np.array([0.229, 0.224, 0.225])
+lastmodelpath = ""
 
 def GetModel(args):
     return TransformerNet()
 
 
 def Eval(usegpu, model, contentsize, stylesize, params):
+    global lastmodelpath
     with torch.no_grad():
         device = torch.device(
             "cuda" if usegpu and torch.cuda.is_available() else "cpu")
@@ -22,8 +24,10 @@ def Eval(usegpu, model, contentsize, stylesize, params):
         content_tf = style_transform(contentsize)
         
         for param in params:
-            contentpath, stylemodel, resultpath = param
-            model.load_state_dict(torch.load(stylemodel, map_location=torch.device(device)))
+            contentpath, modelpath, resultpath = param
+            if lastmodelpath != modelpath:
+                model.load_state_dict(torch.load(modelpath, map_location=torch.device(device)))
+                lastmodelpath = modelpath
             contentImg = content_tf(Image.open(str(contentpath))).to(device).unsqueeze(0)
             output = denormalize(model(contentImg)).cpu()
             save_image(output, resultpath)

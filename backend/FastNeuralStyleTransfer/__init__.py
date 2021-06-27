@@ -1,2 +1,2 @@
-import sys
-sys.path.append("FastNeuralStyleTransfer")
+# import sys
+# sys.path.append("FastNeuralStyleTransfer")
