@@ -10,7 +10,7 @@ from TextToSpeech.model import FastSpeech2, ScheduledOptim
 def get_model_new(configs, device, path):
     (preprocess_config, model_config, train_config) = configs
     model = FastSpeech2(preprocess_config, model_config).to(device)
-    ckpt = torch.load(path)
+    ckpt = torch.load(path, map_location=torch.device(device))
     model.load_state_dict(ckpt["model"])
     model.eval()
     model.requires_grad_ = False
@@ -21,7 +21,7 @@ def get_vocoder_new(device, vocoderconfpath, vocoderpath):
         config = json.load(f)
     config = hifigan.AttrDict(config)
     vocoder = hifigan.Generator(config)
-    ckpt = torch.load(vocoderpath)
+    ckpt = torch.load(vocoderpath, map_location=torch.device(device))
     vocoder.load_state_dict(ckpt["generator"])
     vocoder.eval()
     vocoder.remove_weight_norm()

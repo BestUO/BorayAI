@@ -1,7 +1,7 @@
 from confluent_kafka import Producer
 from confluent_kafka import Consumer
 import myglobal
-
+import time
 
 class SimpleWrapKafka:
 
@@ -48,12 +48,13 @@ class SimpleWrapKafka:
                     messages += [msg.value().decode('utf-8')]
                     batch -= 1
             if len(messages):
-                myglobal.get_logger().info("recv " + str(len(messages)) + " messages:" + str(messages))
+                myglobal.get_logger().info("recv " + str(len(messages)) + " messages request:" + str(messages))
                 res = cbfun(messages)
                 myglobal.get_logger().info("Done with model")
                 for topic, message in res:
                     self.PutMessage(topic, message)
                     myglobal.get_logger().info("send message:"+message)
+                myglobal.get_logger().info("send " + str(len(messages)) + " messages response")
 
     def __CreateConsumer(self):
         c = Consumer({

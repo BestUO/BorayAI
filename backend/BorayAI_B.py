@@ -37,18 +37,19 @@ def main():
     filename:
     middlewarechannel-uuid-content/style/result.jpg
     """
-    # kafka.PutMessage(
-    #     "StyleTransfer-WCT",
-    #     "StyleTransfer-WCT_1234568_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
-    # kafka.PutMessage(
-    #     "StyleTransfer-AdaIN",
-    #     "StyleTransfer-AdaIN_1234566_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
-    # kafka.PutMessage(
-    #     "StyleTransfer-Fast",
-    #     "StyleTransfer-Fast_1234566_20210402/192168001007-1234566-content.jpg:faststyle2_192168001007")
-    # kafka.PutMessage(
-    #     "TextToSpeech",
-    #     "TextToSpeech_1234566_have a good day:en:0_192168001007")
+    for n in range(1):
+    #     kafka.PutMessage(
+    #         "StyleTransfer-WCT",
+    #         "StyleTransfer-WCT_1234568_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
+        # kafka.PutMessage(
+        #     "StyleTransfer-AdaIN",
+        #     "StyleTransfer-AdaIN_1234566_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
+        # kafka.PutMessage(
+        #     "StyleTransfer-Fast",
+        #     "StyleTransfer-Fast_1234566_20210402/192168001007-1234566-content.jpg:faststyle2_192168001007")
+        kafka.PutMessage(
+            "TextToSpeech",
+            "TextToSpeech_1234566_have a good day:en:0_192168001007")
 
     p = process.Process()
     kafka.GetMessage(p.DealWithMessage, conf_json["BatchSize"])

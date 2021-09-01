@@ -17,10 +17,11 @@ def GetModel(args, usegpu):
     device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
     models = {}
     for modelname in args:
-        configs, _ = PrepareBaseInfo(modelname)
+        configs, lexicon = PrepareBaseInfo(modelname)
         enfastspeech = get_model_new(configs, device, args[modelname][0])
         vocoder = get_vocoder_new(device, Path(__file__).parent.joinpath("hifigan","config.json"), args[modelname][1])
-        models[modelname] = [enfastspeech,vocoder]
+        g2p = G2p()
+        models[modelname] = [enfastspeech,vocoder, configs, lexicon, g2p]
     return models
 
 def Eval(usegpu, model, params):
@@ -28,15 +29,15 @@ def Eval(usegpu, model, params):
     with torch.no_grad():
         for param in params:
             text, modelpath, speakerid, modelname, resultpath = param
-            configs, lexicon = PrepareBaseInfo(modelname)
-            batchs, control_values = PrepareText(modelname, speakerid, text, configs[0], lexicon)
-            synthesize(device, model[modelname][0], configs, model[modelname][1], batchs, control_values, resultpath)
+            fastspeech, vocoder, configs, lexicon, g2p = model[modelname]
+            batchs, control_values = PrepareText(modelname, speakerid, text, configs[0], lexicon, g2p)
+            synthesize(device, fastspeech, configs, vocoder, batchs, control_values, resultpath)
 
-def PrepareText(modelname, speakerid, text, preprocess_config, lexicon):
+def PrepareText(modelname, speakerid, text, preprocess_config, lexicon, g2p):
     ids = raw_texts = [text[:100]]
     speakers = np.array([speakerid])
     if modelname == "en":
-        texts = np.array([preprocess_english(text, preprocess_config, lexicon)])
+        texts = np.array([preprocess_english(text, preprocess_config, lexicon, g2p)])
     else :
         texts = np.array([preprocess_mandarin(text, preprocess_config, lexicon)])
     text_lens = np.array([len(texts[0])])
@@ -96,10 +97,9 @@ def read_lexicon(lex_path):
                 lexicon[word.lower()] = phones
     return lexicon
 
-def preprocess_english(text, preprocess_config, lexicon):
+def preprocess_english(text, preprocess_config, lexicon, g2p):
     text = text.rstrip(punctuation)
 
-    g2p = G2p()
     phones = []
     words = re.split(r"([,;.\-\?\!\s+])", text)
     for w in words:

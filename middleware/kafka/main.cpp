@@ -285,22 +285,25 @@ int main()
     });
 
     std::string errstr;
-    std::string brokers("192.168.10.52:9092");
-    std::string topic("mytest");
+    std::string brokers("192.168.1.7:9092");
+    std::string consume("192168001007");
     std::string groupid("g1");
+    std::string produce("TextToSpeech");
+    std::string message("TextToSpeech_1234566_have a good day:en:0_192168001007");
 
     // createtopic(brokers, topic);
     // produce(brokers, topic);
     // consumer(brokers, topic);
 
-    SimpleWrapKafka::inst().CreateProducer(brokers,topic);
-    SimpleWrapKafka::inst().Add2Kafka("mytest","wrap");
-
-    SimpleWrapKafka::inst().CreateConsumer<>(brokers, topic, groupid, [](std::string name)
+    SimpleWrapKafka::inst().CreateProducer(brokers);
+    int t = 0;
+    for(int i=0;i < 100; i++)
+        SimpleWrapKafka::inst().Add2Kafka(produce, message);
+    SimpleWrapKafka::inst().CreateConsumer<>(brokers, consume, groupid, [&](std::string message)
     {
-        std::cout << name << std::endl;
+        std::cout << " aaaaa " << message << t++ << std::endl;
     });
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(1000));
     SimpleWrapKafka::inst().StopConsumer();
 }
