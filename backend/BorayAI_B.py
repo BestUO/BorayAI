@@ -1,6 +1,6 @@
 import myglobal
 import json
-from kafka.simplewrap import SimpleWrapKafka
+from kafkawrap.kafkamessage import kafkamodelwrap
 from modelimplement import StyleTransferWCT
 import process
 import logging
@@ -13,9 +13,9 @@ def main():
     filename = "../config.json"
     with open(filename) as f:
         conf_json = json.load(f)
-    if not os.path.exists(conf_json["backendlogpath"]):
-        os.makedirs(conf_json["backendlogpath"])
-    logfilename = conf_json["backendlogpath"] + "BorayAI_Backend.log"
+    if not os.path.exists(conf_json["LogPath"]):
+        os.makedirs(conf_json["LogPath"])
+    logfilename = conf_json["LogPath"] + "BorayAI_Backend.log"
     logformat = "%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s"
 
     formatter = logging.Formatter(logformat)
@@ -30,31 +30,33 @@ def main():
     myglobal.set_logger(logger)
     myglobal.set_model(StyleTransferWCT())
 
-    kafka = SimpleWrapKafka(conf_json)
-    """
-    message type:
-    functionname_uuid_contentpath:stylepath:alpha_middlewarechannel
-    filename:
-    middlewarechannel-uuid-content/style/result.jpg
-    """
+    ftp = process.FTPWrap(conf_json)
+    p = process.Process(ftp)
+    # ftp.DownLoadFile("StyleTransfer-WCT", "20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8")
+    # ftp.UpLoadFile("StyleTransfer-WCT", "20211117/StyleTransfer-WCT/uuid-styletransfered.jpg")
+    kafka = kafkamodelwrap(conf_json)
+
     for n in range(1):
-    #     kafka.PutMessage(
-    #         "StyleTransfer-WCT",
-    #         "StyleTransfer-WCT_1234568_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
+        # kafka.PutMessage(
+        #     "StyleTransfer-WCT",
+        #     "uuid_StyleTransfer-WCT_20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8_047094002209")
         # kafka.PutMessage(
         #     "StyleTransfer-AdaIN",
-        #     "StyleTransfer-AdaIN_1234566_20210402/192168001007-1234566-content.jpg:20210402/192168001007-1234566-style.jpg:0.8_192168001007")
+        #     "uuid_StyleTransfer-AdaIN_20211117/StyleTransfer-AdaIN/uuid-content.jpg:20211117/StyleTransfer-AdaIN/uuid-style.jpg:0.8_047094002209")
         # kafka.PutMessage(
         #     "StyleTransfer-Fast",
-        #     "StyleTransfer-Fast_1234566_20210402/192168001007-1234566-content.jpg:faststyle2_192168001007")
+        #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle2_047094002209")
+        # kafka.PutMessage(
+        #     "TextToSpeech",
+        #     "uuid_TextToSpeech_have a good day:en:0_047094002209")
         kafka.PutMessage(
-            "TextToSpeech",
-            "TextToSpeech_1234566_have a good day:en:0_192168001007")
+            "Translate",
+            "uuid_Translate_今天是个好天气_047094002209")
 
-    p = process.Process()
     kafka.GetMessage(p.DealWithMessage, conf_json["BatchSize"])
-    myglobal.get_logger.removeHandler(log_file_handler)
+    logger.removeHandler(log_file_handler)
 
+    
 
 if __name__ == "__main__":
     main()

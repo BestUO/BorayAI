@@ -4,7 +4,7 @@ path:
   corpus_path: "/home/uncleorange/myssd/AISHELL-3"
   lexicon_path: "lexicon/pinyin-lexicon-r.txt"
   raw_path: "/home/uncleorange/myssd/raw_data/AISHELL3"
-  preprocessed_path: "/home/uncleorange/myssd/preprocessed_data/AISHELL3"
+  preprocessed_path: "/home/uncleorange/mydevice/nlp/data/TTS/preprocessed_data/AISHELL3"
 
 preprocessing:
   val_size: 512

@@ -3,6 +3,7 @@ import json
 import PytorchWCT.stwct as stwct
 import PytorchAdaIN.stadain as stadain
 import FastNeuralStyleTransfer.stfast as stfast
+import HuggingFace.translate as translate
 import TextToSpeech.tts as tts
 import time
 import os
@@ -35,11 +36,7 @@ class ModelInterface(ABC):
         pass
 
     def MKDIRByDay(self):
-        # dirpath = self.conf_json["ResultDirPath"] + time.strftime("%Y%m%d", time.localtime())
-        # if not os.path.exists(dirpath):
-        #     os.makedirs(dirpath)
-        # return dirpath + "/"
-        dirpath = Path(self.conf_json["ResultDirPath"]).joinpath(time.strftime("%Y%m%d", time.localtime()),self.name)
+        dirpath = Path(self.conf_json["LocalResponseDir"]).joinpath(time.strftime("%Y%m%d", time.localtime()),self.name)
         os.makedirs(dirpath, exist_ok=True)
         return dirpath
 
@@ -52,24 +49,21 @@ class StyleTransferWCT(ModelInterface):
         self.model = self._GetModel()
         
     def _GetModel(self):
-        return stwct.GetModel(self.config)
+        return stwct.GetModel(self.usegpu, self.config)
 
     def _Parseconfig(self, json):
         return json
 
     def _ParseParams(self, params):
         def parsemodelparams(modelparams):
-            contentpath, stylepath, alpha = modelparams.split(":")
-            contentpath = self.conf_json["MiddlewareDirPath"] + contentpath
-            stylepath = self.conf_json["MiddlewareDirPath"] + stylepath
-            return [contentpath, stylepath, alpha]
+            return modelparams
 
         resultpath = self.MKDIRByDay()
         p1 = []
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.jpg"))]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.jpg"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -77,7 +71,7 @@ class StyleTransferWCT(ModelInterface):
         stwct.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][3][len(self.conf_json["ResultDirPath"]):]]]
+            result += [[p[0][0], p[0][1] + "_" + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 
@@ -89,24 +83,21 @@ class StyleTransferAdaIN(ModelInterface):
         self.model = self._GetModel()
 
     def _GetModel(self):
-        return stadain.GetModel(self.config)
+        return stadain.GetModel(self.usegpu, self.config)
 
     def _Parseconfig(self, json):
         return json
 
     def _ParseParams(self, params):
         def parsemodelparams(modelparams):
-            contentpath, stylepath, alpha = modelparams.split(":")
-            contentpath = self.conf_json["MiddlewareDirPath"] + contentpath
-            stylepath = self.conf_json["MiddlewareDirPath"] + stylepath
-            return [contentpath, stylepath, alpha]
+            return modelparams
 
         resultpath = self.MKDIRByDay()
         p1 = []
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.jpg"))]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.jpg"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -114,7 +105,7 @@ class StyleTransferAdaIN(ModelInterface):
         stadain.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][3][len(self.conf_json["ResultDirPath"]):]]]
+            result += [[p[0][0], p[0][1] + "_" + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 
@@ -126,24 +117,22 @@ class StyleTransferFast(ModelInterface):
         self.model = self._GetModel()
 
     def _GetModel(self):
-        return stfast.GetModel(self.config)
+        return stfast.GetModel(self.usegpu, self.config)
 
     def _Parseconfig(self, json):
         return json
 
     def _ParseParams(self, params):
         def parsemodelparams(modelparams):
-            contentpath, modelname = modelparams.split(":")
-            contentpath = self.conf_json["MiddlewareDirPath"] + contentpath
-            modelpath = self.config[modelname]
-            return [contentpath, modelpath]
+            modelpath = self.config[modelparams[-1]]
+            return [modelparams[0], modelpath]
 
         resultpath = self.MKDIRByDay()
         p1 = []
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.jpg"))]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.jpg"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -151,7 +140,7 @@ class StyleTransferFast(ModelInterface):
         stfast.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][2][len(self.conf_json["ResultDirPath"]):]]]
+            result += [[p[0][0], p[0][1] + "_" + p[1][2][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 class FastSpeech(ModelInterface):
@@ -159,17 +148,17 @@ class FastSpeech(ModelInterface):
     def __init__(self, name="TextToSpeech"):
         super(FastSpeech, self).__init__(name)
         self.config = self._Parseconfig(self.conf_json[name])
-        self.model = self._GetModel(self.usegpu)
+        self.model = self._GetModel()
 
-    def _GetModel(self, usegpu):
-        return tts.GetModel(self.config, usegpu)
+    def _GetModel(self):
+        return tts.GetModel(self.usegpu, self.config)
 
     def _Parseconfig(self, json):
         return json
 
     def _ParseParams(self, params):
         def parsemodelparams(modelparams):
-            text, modelname, speakerid = modelparams.split(":")
+            text, modelname, speakerid = modelparams
             modelpath = self.config[modelname]
             return [text, modelpath, int(speakerid), modelname]
 
@@ -178,7 +167,7 @@ class FastSpeech(ModelInterface):
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.topic+"-"+param.uuid+"-result.wav"))]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-result.wav"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -186,7 +175,40 @@ class FastSpeech(ModelInterface):
         tts.Eval(self.usegpu, self.model, p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][4][len(self.conf_json["ResultDirPath"]):]]]
+            result += [[p[0][0], p[0][1] + "_" + p[1][4][len(self.conf_json["LocalResponseDir"]):]]]
+        return result
+
+class Translate(ModelInterface):
+
+    def __init__(self, name="Translate"):
+        super(Translate, self).__init__(name)
+        self.config = self._Parseconfig(self.conf_json[name])
+        self.model = self._GetModel()
+
+    def _GetModel(self):
+        return translate.GetModel(self.usegpu, self.config)
+
+    def _Parseconfig(self, json):
+        return json
+
+    def _ParseParams(self, params):
+        def parsemodelparams(modelparams):
+            return modelparams.split("/")
+
+        resultpath = self.MKDIRByDay()
+        p1 = []
+        p2 = []
+        for param in params:
+            p1 += [[param.topic, param.uuid]]
+            p2 += [parsemodelparams(param.modelparams)]
+        return p1, p2
+
+    def Eval(self, params):
+        p1, p2 = self._ParseParams(params)
+        translated = translate.Eval(self.usegpu, self.model, p2)
+        result = []
+        for p in zip(p1, p2):
+            result += [[p[0][0], p[0][1] + "_" + translated]]
         return result
 
 class StyleTransferNone(ModelInterface):

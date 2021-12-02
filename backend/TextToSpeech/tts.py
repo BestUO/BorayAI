@@ -13,7 +13,7 @@ from TextToSpeech.utils.model import get_model_new, get_vocoder_new
 mean = np.array([0.485, 0.456, 0.406])
 
 
-def GetModel(args, usegpu):
+def GetModel(usegpu, args):
     device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
     models = {}
     for modelname in args:
@@ -21,7 +21,7 @@ def GetModel(args, usegpu):
         enfastspeech = get_model_new(configs, device, args[modelname][0])
         vocoder = get_vocoder_new(device, Path(__file__).parent.joinpath("hifigan","config.json"), args[modelname][1])
         g2p = G2p()
-        models[modelname] = [enfastspeech,vocoder, configs, lexicon, g2p]
+        models[modelname] = [enfastspeech, vocoder, configs, lexicon, g2p]
     return models
 
 def Eval(usegpu, model, params):

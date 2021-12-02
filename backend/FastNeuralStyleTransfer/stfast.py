@@ -10,8 +10,9 @@ mean = np.array([0.485, 0.456, 0.406])
 std = np.array([0.229, 0.224, 0.225])
 lastmodelpath = ""
 
-def GetModel(args):
-    return TransformerNet()
+def GetModel(usegpu, args):
+    device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
+    return TransformerNet().to(device)
 
 
 def Eval(usegpu, model, contentsize, stylesize, params):
@@ -19,7 +20,6 @@ def Eval(usegpu, model, contentsize, stylesize, params):
     with torch.no_grad():
         device = torch.device(
             "cuda" if usegpu and torch.cuda.is_available() else "cpu")
-        model = model.to(device)
         model.eval()
         content_tf = style_transform(contentsize)
         

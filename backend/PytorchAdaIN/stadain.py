@@ -7,24 +7,22 @@ from torchvision.utils import save_image
 from PytorchAdaIN.function import adaptive_instance_normalization
 
 
-def GetModel(config):
+def GetModel(usegpu, config):
+    device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
     vgg = adainnet.vgg
     vgg.load_state_dict(torch.load(config["adain_vgg"]))
     vgg = nn.Sequential(*list(vgg.children())[:31])
 
     decoder = adainnet.decoder
     decoder.load_state_dict(torch.load(config["adain_decoder"]))
-    return vgg, decoder
+    return vgg.to(device), decoder.to(device)
 
 
 def Eval(usegpu, model, contentsize, stylesize, params):
     with torch.no_grad():
-        device = torch.device(
-            "cuda" if usegpu and torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
         vgg, decoder = model
-        vgg.to(device)
         vgg.eval()
-        decoder.to(device)
         decoder.eval()
         content_tf = AdainTransform(contentsize)
         style_tf = AdainTransform(stylesize)

@@ -4,7 +4,6 @@ project(uokafka)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ../lib)
 
 include_directories(${THIRD_PARTY_PATH}/include)
-#MESSAGE("aaaaa")
 MESSAGE(${THIRD_PARTY_PATH}/lib/rdkafka)
 include_directories(${THIRD_PARTY_PATH}/include/rdkafka)
 link_directories(${THIRD_PARTY_PATH}/lib/rdkafka)

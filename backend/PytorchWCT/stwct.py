@@ -5,15 +5,15 @@ from torchvision.utils import save_image
 from PIL import Image
 
 
-def GetModel(args):
-    return WCT(args)
+def GetModel(usegpu, args):
+    device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
+    return WCT(args).to(device)
 
 
 def Eval(usegpu, model, contentsize, stylesize, params):
     with torch.no_grad():
         device = torch.device(
             "cuda" if usegpu and torch.cuda.is_available() else "cpu")
-        model = model.to(device)
         model.eval()
         content_tf = WCTTransform(contentsize)
         style_tf = WCTTransform(stylesize)

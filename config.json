@@ -1,25 +1,30 @@
 {
-    "FunctionTopic":[
+    "RequestTopic":[
         "StyleTransfer-WCT",
         "StyleTransfer-AdaIN",
         "StyleTransfer-Fast",
-        "TextToSpeech"
+        "TextToSpeech",
+        "Translate"
     ],
-    "MiddlewareTopic":[
+    "ResponseTopic":[
         "192168001007"
     ],
-    "bootstrap.servers":[
-        "192.168.1.7:9092"
+    "BootstrapServers":[
+        "47.94.2.209:9981"
     ],
-    "middlewarelogpath":"/home/uncleorange/mydevice/BorayAI/logs/middleware/",
-    "backendlogpath":"/home/uncleorange/mydevice/BorayAI/logs/backend/",
+    "FTPConfig":{
+        "host":"47.94.2.209",
+        "user":"ftp-aiecent",
+        "passwd":"yy540311C@",
+        "requestdir":"~/request",
+        "responsedir":"~/response"
+    },
+    "LogPath":"/home/uncleorange/mydevice/BorayAI/logs/backend/",
     "Port":"7086",
-    "GroupID":"g1",
+    "GroupID":"work1",
     "BatchSize":16,
-    "//":"must end by '/'",
-    "MiddlewareDirPath":"/home/uncleorange/mydevice/BorayAI/data/middleware/",
-    "//":"must end by '/'",
-    "ResultDirPath":"/home/uncleorange/mydevice/BorayAI/data/backend/",
+    "LocalRequestDir":"/home/uncleorange/mydevice/BorayAI/data/request/",
+    "LocalResponseDir":"/home/uncleorange/mydevice/BorayAI/data/response/",
     "UseGPU":true,
     "ContentSize":512,
     "StyleSize":512,
@@ -53,5 +58,9 @@
     {
         "en":["/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/LJSpeech.pth.tar","/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/generator_LJSpeech.pth.tar"],
         "zh":["/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/aishell3.pth.tar","/home/uncleorange/mydevice/BorayAI/backend/models/ttsmodels/generator_universal.pth.tar"]
+    },
+    "Translate":
+    {
+        "zh_en":"/home/uncleorange/myssd/translate/Helsinki-NLP/opus-mt-zh-en"
     }
 }
