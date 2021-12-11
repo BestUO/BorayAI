@@ -71,7 +71,7 @@ class StyleTransferWCT(ModelInterface):
         stwct.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
+            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 
@@ -105,7 +105,7 @@ class StyleTransferAdaIN(ModelInterface):
         stadain.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
+            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 
@@ -140,7 +140,7 @@ class StyleTransferFast(ModelInterface):
         stfast.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][2][len(self.conf_json["LocalResponseDir"]):]]]
+            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][2][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 class FastSpeech(ModelInterface):
@@ -167,7 +167,7 @@ class FastSpeech(ModelInterface):
         p2 = []
         for param in params:
             p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-result.wav"))]]
+            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.wav"))]]
         return p1, p2
 
     def Eval(self, params):
@@ -175,7 +175,7 @@ class FastSpeech(ModelInterface):
         tts.Eval(self.usegpu, self.model, p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + p[1][4][len(self.conf_json["LocalResponseDir"]):]]]
+            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][4][len(self.conf_json["LocalResponseDir"]):]]]
         return result
 
 class Translate(ModelInterface):
@@ -208,7 +208,7 @@ class Translate(ModelInterface):
         translated = translate.Eval(self.usegpu, self.model, p2)
         result = []
         for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_" + translated]]
+            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + translated]]
         return result
 
 class StyleTransferNone(ModelInterface):

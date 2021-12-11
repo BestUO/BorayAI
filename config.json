@@ -6,11 +6,9 @@
         "TextToSpeech",
         "Translate"
     ],
-    "ResponseTopic":[
-        "192168001007"
-    ],
+    "DefaultTopic":"047094002209",
     "BootstrapServers":[
-        "47.94.2.209:9981"
+        "47.116.68.241:9981"
     ],
     "FTPConfig":{
         "host":"47.94.2.209",

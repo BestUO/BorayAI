@@ -79,9 +79,10 @@ class FTPWrap():
 
 class Process:
 
-    def __init__(self, ftpwrap):
+    def __init__(self, ftpwrap, config):
         self.models = {}
         self.ftpwrap = ftpwrap
+        self.config = config
 
     def __FtpDownload__(self, funname, modelparams):
         return self.ftpwrap.DownLoadFile(funname, modelparams)
@@ -89,10 +90,44 @@ class Process:
     def __FtpUpload__(self, funname, modelparams):
         return self.ftpwrap.UpLoadFile(funname, modelparams)
 
+    def __CheckWCTAdaINParams__(self, modelparams):
+        # 20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8
+        img1, img2, alpha = modelparams.split(":")
+
+    def __CheckFastParams__(self, modelparams):
+        # 20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle2
+        img1, modelname = modelparams.split(":")
+        if modelname not in self.config["StyleTransfer-Fast"]:
+            raise ValueError
+
+    def __CheckTextToSpeechParams__(self, modelparams):
+        # have a good day:en:0
+        s, language, speakid = modelparams.split(":")
+        if language not in self.config["TextToSpeech"] or speakid != "0":
+            raise ValueError
+
+    def __CheckTranslateParams__(self, modelparams):
+        # 今天是个好天气
+        return True
+
+    def __CheckParams__(self, uuid, funname, modelparams, restopic):
+        if funname == "StyleTransfer-WCT" or funname == "StyleTransfer-AdaIN" :
+            self.__CheckWCTAdaINParams__(modelparams)
+        elif funname == "StyleTransfer-Fast":
+            self.__CheckFastParams__(modelparams)
+        elif funname == "TextToSpeech":
+            self.__CheckTextToSpeechParams__(modelparams)
+        elif funname == "Translate":
+            self.__CheckTranslateParams__(modelparams)
+
     def DealWithMessage(self, messages):
         tasks = {}
         for message in messages:
-            uuid, funname, modelparams, restopic = message.split("_")
+            try:
+                uuid, funname, modelparams, restopic = message.split("_")
+                self.__CheckParams__(uuid, funname, modelparams, restopic)
+            except ValueError:
+                return [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
             modelparams = self.__FtpDownload__(funname, modelparams)
             if funname in tasks:
                 tasks[funname] += [myglobal.InParams(uuid, modelparams, restopic)]

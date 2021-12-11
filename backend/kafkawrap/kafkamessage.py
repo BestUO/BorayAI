@@ -9,17 +9,18 @@ class kafkamodelwrap:
 
     def __init__(self, config):
 
-        functiontopics, _, kafkaservers, group_id = self.__GetConfig(config)
+        functiontopics, kafkaservers, group_id = self.__GetConfig(config)
         self.producers = self.__CreateProducer(kafkaservers)
         self.consumers = self.__CreateConsumer(functiontopics=functiontopics, group_id=group_id, bootstrap_servers=kafkaservers)
 
     def __GetConfig(self, config):
-        return config["RequestTopic"], config["ResponseTopic"], config["BootstrapServers"], config["GroupID"]
+        return config["RequestTopic"], config["BootstrapServers"], config["GroupID"]
 
     def __CreateConsumer(self, functiontopics, group_id, bootstrap_servers):
         consumers =KafkaConsumer(group_id=group_id,
                             bootstrap_servers=bootstrap_servers,
-                            value_deserializer=lambda m: json.loads(m.decode('ascii')))
+                            value_deserializer=lambda m: json.loads(m.decode('ascii')),
+                            heartbeat_interval_ms=30)
         # consumers =KafkaConsumer(group_id=group_id,
         #                     bootstrap_servers=bootstrap_servers)
         consumers.subscribe(functiontopics)

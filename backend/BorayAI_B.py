@@ -31,27 +31,27 @@ def main():
     myglobal.set_model(StyleTransferWCT())
 
     ftp = process.FTPWrap(conf_json)
-    p = process.Process(ftp)
+    p = process.Process(ftp, conf_json)
     # ftp.DownLoadFile("StyleTransfer-WCT", "20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8")
     # ftp.UpLoadFile("StyleTransfer-WCT", "20211117/StyleTransfer-WCT/uuid-styletransfered.jpg")
     kafka = kafkamodelwrap(conf_json)
 
-    for n in range(1):
-        # kafka.PutMessage(
-        #     "StyleTransfer-WCT",
-        #     "uuid_StyleTransfer-WCT_20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8_047094002209")
-        # kafka.PutMessage(
-        #     "StyleTransfer-AdaIN",
-        #     "uuid_StyleTransfer-AdaIN_20211117/StyleTransfer-AdaIN/uuid-content.jpg:20211117/StyleTransfer-AdaIN/uuid-style.jpg:0.8_047094002209")
-        # kafka.PutMessage(
-        #     "StyleTransfer-Fast",
-        #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle2_047094002209")
-        # kafka.PutMessage(
-        #     "TextToSpeech",
-        #     "uuid_TextToSpeech_have a good day:en:0_047094002209")
-        kafka.PutMessage(
-            "Translate",
-            "uuid_Translate_今天是个好天气_047094002209")
+    # for n in range(1):
+    # kafka.PutMessage(
+    #     "StyleTransfer-WCT",
+    #     "uuid_StyleTransfer-WCT_20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8_047094002209")
+    # kafka.PutMessage(
+    #     "StyleTransfer-AdaIN",
+    #     "uuid_StyleTransfer-AdaIN_20211117/StyleTransfer-AdaIN/uuid-content.jpg:20211117/StyleTransfer-AdaIN/uuid-style.jpg:0.8_047094002209")
+    # kafka.PutMessage(
+    #     "StyleTransfer-Fast",
+    #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle10_047094002209")
+    kafka.PutMessage(
+        "TextToSpeech",
+        "uuid_TextToSpeech_have a good day:en:0_047094002209")
+    # kafka.PutMessage(
+    #     "Translate",
+    #     "uuid_Translate_今天是个好天气_047094002209")
 
     kafka.GetMessage(p.DealWithMessage, conf_json["BatchSize"])
     logger.removeHandler(log_file_handler)
