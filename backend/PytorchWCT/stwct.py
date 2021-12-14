@@ -10,7 +10,7 @@ def GetModel(usegpu, args):
     return WCT(args).to(device)
 
 
-def Eval(usegpu, model, contentsize, stylesize, params):
+def Eval(usegpu, model, contentsize, stylesize, param):
     with torch.no_grad():
         device = torch.device(
             "cuda" if usegpu and torch.cuda.is_available() else "cpu")
@@ -19,16 +19,15 @@ def Eval(usegpu, model, contentsize, stylesize, params):
         style_tf = WCTTransform(stylesize)
         csF = torch.Tensor().to(device)
 
-        for param in params:
-            contentpath, stylepath, alpha, resultpath = param
-            contentImg = content_tf(
-                Image.open(contentpath)).to(device).unsqueeze(0)
-            styleImg = style_tf(Image.open(stylepath)).to(device).unsqueeze(0)
-            output = StyleTransfer(model, float(alpha), contentImg, styleImg,
-                                   csF)
+        contentpath, stylepath, alpha, resultpath = param
+        contentImg = content_tf(
+            Image.open(contentpath)).to(device).unsqueeze(0)
+        styleImg = style_tf(Image.open(stylepath)).to(device).unsqueeze(0)
+        output = StyleTransfer(model, float(alpha), contentImg, styleImg,
+                                csF)
 
-            output = output.cpu()
-            save_image(output, resultpath)
+        output = output.cpu()
+        save_image(output, resultpath)
 
 
 def WCTTransform(size, crop=False):

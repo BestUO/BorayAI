@@ -18,7 +18,7 @@ def GetModel(usegpu, config):
     return vgg.to(device), decoder.to(device)
 
 
-def Eval(usegpu, model, contentsize, stylesize, params):
+def Eval(usegpu, model, contentsize, stylesize, param):
     with torch.no_grad():
         device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
         vgg, decoder = model
@@ -27,16 +27,15 @@ def Eval(usegpu, model, contentsize, stylesize, params):
         content_tf = AdainTransform(contentsize)
         style_tf = AdainTransform(stylesize)
 
-        for param in params:
-            contentpath, stylepath, alpha, resultpath = param
-            contentImg = content_tf(Image.open(
-                str(contentpath))).to(device).unsqueeze(0)
-            styleImg = style_tf(Image.open(stylepath)).to(device).unsqueeze(0)
+        contentpath, stylepath, alpha, resultpath = param
+        contentImg = content_tf(Image.open(
+            str(contentpath))).to(device).unsqueeze(0)
+        styleImg = style_tf(Image.open(stylepath)).to(device).unsqueeze(0)
 
-            output = StyleTransfer(device, vgg, decoder, contentImg, styleImg, float(alpha))
+        output = StyleTransfer(device, vgg, decoder, contentImg, styleImg, float(alpha))
 
-            output = output.cpu()
-            save_image(output, resultpath)
+        output = output.cpu()
+        save_image(output, resultpath)
 
 
 def AdainTransform(size, crop=False):

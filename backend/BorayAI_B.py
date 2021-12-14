@@ -45,10 +45,10 @@ def main():
     #     "uuid_StyleTransfer-AdaIN_20211117/StyleTransfer-AdaIN/uuid-content.jpg:20211117/StyleTransfer-AdaIN/uuid-style.jpg:0.8_047094002209")
     # kafka.PutMessage(
     #     "StyleTransfer-Fast",
-    #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle10_047094002209")
-    kafka.PutMessage(
-        "TextToSpeech",
-        "uuid_TextToSpeech_have a good day:en:0_047094002209")
+    #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle1_047094002209")
+    # kafka.PutMessage(
+    #     "TextToSpeech",
+    #     "uuid_TextToSpeech_have a good day:en:0_047094002209")
     # kafka.PutMessage(
     #     "Translate",
     #     "uuid_Translate_今天是个好天气_047094002209")

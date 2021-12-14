@@ -24,14 +24,13 @@ def GetModel(usegpu, args):
         models[modelname] = [enfastspeech, vocoder, configs, lexicon, g2p]
     return models
 
-def Eval(usegpu, model, params):
+def Eval(usegpu, model, param):
     device = torch.device("cuda" if usegpu and torch.cuda.is_available() else "cpu")
     with torch.no_grad():
-        for param in params:
-            text, modelpath, speakerid, modelname, resultpath = param
-            fastspeech, vocoder, configs, lexicon, g2p = model[modelname]
-            batchs, control_values = PrepareText(modelname, speakerid, text, configs[0], lexicon, g2p)
-            synthesize(device, fastspeech, configs, vocoder, batchs, control_values, resultpath)
+        text, modelpath, speakerid, modelname, resultpath = param
+        fastspeech, vocoder, configs, lexicon, g2p = model[modelname]
+        batchs, control_values = PrepareText(modelname, speakerid, text, configs[0], lexicon, g2p)
+        synthesize(device, fastspeech, configs, vocoder, batchs, control_values, resultpath)
 
 def PrepareText(modelname, speakerid, text, preprocess_config, lexicon, g2p):
     ids = raw_texts = [text[:100]]

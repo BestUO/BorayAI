@@ -5,6 +5,7 @@ from ftplib import FTP, error_perm
 from pathlib import Path
 import time
 import os
+import paramspreprocess
 
 class FTPWrap():
     def __init__(self, config):
@@ -20,16 +21,18 @@ class FTPWrap():
 
     def DownLoadFile(self, funname, modelparams):
         if(funname == "StyleTransfer-WCT" or funname == "StyleTransfer-AdaIN"):
-            return self.__DownLoadWCTAdaIN__(modelparams)
+            self.__DownLoadWCTAdaIN__(modelparams)
         elif(funname == "StyleTransfer-Fast"):
-            return self.__DownLoadFast__(modelparams)
+            self.__DownLoadFast__(modelparams)
         elif(funname == "TextToSpeech"):
-            return self.__DownLoadTextToSpeech__(modelparams)
+            self.__DownLoadTextToSpeech__(modelparams)
         elif(funname == "Translate"):
-            return self.__DownLoadTranslate__(modelparams)
+            self.__DownLoadTranslate__(modelparams)
 
     def __DownLoadWCTAdaIN__(self, modelparams):
-        content, style, alpha = modelparams.split(":")
+        content, style, alpha = modelparams
+        content = content.replace(self.localrequestdir,"")
+        style = style.replace(self.localrequestdir,"")
         contentfilepath = Path(self.localrequestdir).joinpath(content)
         stylefilepath = Path(self.localrequestdir).joinpath(style)
         os.makedirs(contentfilepath.parent, exist_ok=True)
@@ -39,23 +42,23 @@ class FTPWrap():
             self.ftp.retrbinary("RETR " + content, fp.write)
         with open(stylefilepath,"wb") as fp:
             self.ftp.retrbinary("RETR " + style, fp.write)
-        return [str(contentfilepath), str(stylefilepath), alpha]
 
     def __DownLoadFast__(self, modelparams):
-        content, style = modelparams.split(":")
+        content, style = modelparams
+        content = content.replace(self.localrequestdir,"")
         contentfilepath = Path(self.localrequestdir).joinpath(content)
         os.makedirs(contentfilepath.parent, exist_ok=True)
         
         self.ftp.cwd(self.requestdir)
         with open(contentfilepath,"wb") as fp:
             self.ftp.retrbinary("RETR " + content, fp.write)
-        return [str(contentfilepath), style]
+
 
     def __DownLoadTextToSpeech__(self, modelparams):
-        return modelparams.split(":")
+        pass
 
     def __DownLoadTranslate__(self, modelparams):
-        return modelparams
+        pass
 
     def UpLoadFile(self, funname, message):
         if(funname == "StyleTransfer-WCT" or funname == "StyleTransfer-AdaIN" 
@@ -84,62 +87,60 @@ class Process:
         self.ftpwrap = ftpwrap
         self.config = config
 
-    def __FtpDownload__(self, funname, modelparams):
-        return self.ftpwrap.DownLoadFile(funname, modelparams)
+    def __FtpDownload__(self, *arg, **kwargs):
+        self.ftpwrap.DownLoadFile(*arg, **kwargs)
 
-    def __FtpUpload__(self, funname, modelparams):
-        return self.ftpwrap.UpLoadFile(funname, modelparams)
+    def __FtpUpload__(self, *arg, **kwargs):
+        return self.ftpwrap.UpLoadFile(*arg, **kwargs)
 
-    def __CheckWCTAdaINParams__(self, modelparams):
-        # 20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8
-        img1, img2, alpha = modelparams.split(":")
+    # def DealWithMessage(self, messages):
+    #     tasks = {}
+    #     try:#err code
+    #         for message in messages:
+    #             uuid, funname, modelparams, restopic = message.split("_")
+    #             # modelparams = self.__FtpDownload__(funname, modelparams)
+    #             if funname in tasks:
+    #                 tasks[funname] += [myglobal.InParams(uuid, modelparams, restopic)]
+    #             else:
+    #                 tasks[funname] = [myglobal.InParams(uuid, modelparams, restopic)]
 
-    def __CheckFastParams__(self, modelparams):
-        # 20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle2
-        img1, modelname = modelparams.split(":")
-        if modelname not in self.config["StyleTransfer-Fast"]:
-            raise ValueError
+    #         res = []
+    #         for name in tasks:
+    #             model = self.__GetModelImpl(name)
+    #             if(model.name != "None"):
+    #                 res += model.Eval(tasks[name])
+    #                 self.__FtpUpload__(name, res[-1][-1])
+    #         return res
+    #     except ValueError:
+    #         return [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
 
-    def __CheckTextToSpeechParams__(self, modelparams):
-        # have a good day:en:0
-        s, language, speakid = modelparams.split(":")
-        if language not in self.config["TextToSpeech"] or speakid != "0":
-            raise ValueError
-
-    def __CheckTranslateParams__(self, modelparams):
-        # 今天是个好天气
-        return True
-
-    def __CheckParams__(self, uuid, funname, modelparams, restopic):
-        if funname == "StyleTransfer-WCT" or funname == "StyleTransfer-AdaIN" :
-            self.__CheckWCTAdaINParams__(modelparams)
-        elif funname == "StyleTransfer-Fast":
-            self.__CheckFastParams__(modelparams)
-        elif funname == "TextToSpeech":
-            self.__CheckTextToSpeechParams__(modelparams)
-        elif funname == "Translate":
-            self.__CheckTranslateParams__(modelparams)
+    # def DealWithMessage(self, messages):
+    #     res = []
+    #     for message in messages:
+    #         try:
+    #             uuid, funname, modelparams, restopic = message.split("_")
+    #             modelparams = self.__FtpDownload__(funname, modelparams)
+    #             model = self.__GetModelImpl(funname)
+    #             if(model.name != "None"):
+    #                 res += model.Eval([myglobal.InParams(uuid, modelparams, restopic)])
+    #                 self.__FtpUpload__(funname, res[-1][-1])
+    #         except ValueError:
+    #             res += [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
+    #     return res
 
     def DealWithMessage(self, messages):
-        tasks = {}
+        res = []
         for message in messages:
             try:
-                uuid, funname, modelparams, restopic = message.split("_")
-                self.__CheckParams__(uuid, funname, modelparams, restopic)
+                paramsprecheck = paramspreprocess.GetParamsPreProcesscls(self.config, message)
+                params = paramsprecheck.ParamsPreProcess()
+                self.__FtpDownload__(paramsprecheck.funname, params[1])
+                model = self.__GetModelImpl(paramsprecheck.funname)
+                if(model.name != "None"):
+                    res += [model.Eval(params)]
+                    self.__FtpUpload__(paramsprecheck.funname, res[-1][-1])
             except ValueError:
-                return [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
-            modelparams = self.__FtpDownload__(funname, modelparams)
-            if funname in tasks:
-                tasks[funname] += [myglobal.InParams(uuid, modelparams, restopic)]
-            else:
-                tasks[funname] = [myglobal.InParams(uuid, modelparams, restopic)]
-
-        res = []
-        for name in tasks:
-            model = self.__GetModelImpl(name)
-            if(model.name != "None"):
-                res += model.Eval(tasks[name])
-                self.__FtpUpload__(name, res[-1][-1])
+                res += [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
         return res
 
     def __GetModelImpl(self, funname):

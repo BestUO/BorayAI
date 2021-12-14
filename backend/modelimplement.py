@@ -28,10 +28,6 @@ class ModelInterface(ABC):
         pass
 
     @abstractmethod
-    def _ParseParams(self, params):
-        pass
-
-    @abstractmethod
     def Eval(self, params):
         pass
 
@@ -54,25 +50,12 @@ class StyleTransferWCT(ModelInterface):
     def _Parseconfig(self, json):
         return json
 
-    def _ParseParams(self, params):
-        def parsemodelparams(modelparams):
-            return modelparams
-
-        resultpath = self.MKDIRByDay()
-        p1 = []
-        p2 = []
-        for param in params:
-            p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.jpg"))]]
-        return p1, p2
-
     def Eval(self, params):
-        p1, p2 = self._ParseParams(params)
+        resultpath = self.MKDIRByDay()
+        p1, p2 = params
+        p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stwct.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
-        result = []
-        for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
-        return result
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
 
 
 class StyleTransferAdaIN(ModelInterface):
@@ -88,25 +71,12 @@ class StyleTransferAdaIN(ModelInterface):
     def _Parseconfig(self, json):
         return json
 
-    def _ParseParams(self, params):
-        def parsemodelparams(modelparams):
-            return modelparams
-
-        resultpath = self.MKDIRByDay()
-        p1 = []
-        p2 = []
-        for param in params:
-            p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.jpg"))]]
-        return p1, p2
-
     def Eval(self, params):
-        p1, p2 = self._ParseParams(params)
+        resultpath = self.MKDIRByDay()
+        p1, p2 = params
+        p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stadain.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
-        result = []
-        for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][-1][len(self.conf_json["LocalResponseDir"]):]]]
-        return result
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
 
 
 class StyleTransferFast(ModelInterface):
@@ -122,26 +92,12 @@ class StyleTransferFast(ModelInterface):
     def _Parseconfig(self, json):
         return json
 
-    def _ParseParams(self, params):
-        def parsemodelparams(modelparams):
-            modelpath = self.config[modelparams[-1]]
-            return [modelparams[0], modelpath]
-
-        resultpath = self.MKDIRByDay()
-        p1 = []
-        p2 = []
-        for param in params:
-            p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.jpg"))]]
-        return p1, p2
-
     def Eval(self, params):
-        p1, p2 = self._ParseParams(params)
+        resultpath = self.MKDIRByDay()
+        p1, p2 = params
+        p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stfast.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
-        result = []
-        for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][2][len(self.conf_json["LocalResponseDir"]):]]]
-        return result
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
 
 class FastSpeech(ModelInterface):
 
@@ -156,27 +112,12 @@ class FastSpeech(ModelInterface):
     def _Parseconfig(self, json):
         return json
 
-    def _ParseParams(self, params):
-        def parsemodelparams(modelparams):
-            text, modelname, speakerid = modelparams
-            modelpath = self.config[modelname]
-            return [text, modelpath, int(speakerid), modelname]
-
-        resultpath = self.MKDIRByDay()
-        p1 = []
-        p2 = []
-        for param in params:
-            p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams) + [str(resultpath.joinpath(param.uuid+"-response.wav"))]]
-        return p1, p2
-
     def Eval(self, params):
-        p1, p2 = self._ParseParams(params)
+        resultpath = self.MKDIRByDay()
+        p1, p2 = params
+        p2 += [str(resultpath.joinpath(p1[1]+"-response.wav"))]
         tts.Eval(self.usegpu, self.model, p2)
-        result = []
-        for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + p[1][4][len(self.conf_json["LocalResponseDir"]):]]]
-        return result
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
 
 class Translate(ModelInterface):
 
@@ -191,25 +132,10 @@ class Translate(ModelInterface):
     def _Parseconfig(self, json):
         return json
 
-    def _ParseParams(self, params):
-        def parsemodelparams(modelparams):
-            return modelparams.split("/")
-
-        resultpath = self.MKDIRByDay()
-        p1 = []
-        p2 = []
-        for param in params:
-            p1 += [[param.topic, param.uuid]]
-            p2 += [parsemodelparams(param.modelparams)]
-        return p1, p2
-
     def Eval(self, params):
-        p1, p2 = self._ParseParams(params)
+        p1, p2 = params
         translated = translate.Eval(self.usegpu, self.model, p2)
-        result = []
-        for p in zip(p1, p2):
-            result += [[p[0][0], p[0][1] + "_{name}_".format(name=self.name) + translated]]
-        return result
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + translated]
 
 class StyleTransferNone(ModelInterface):
 
@@ -220,9 +146,6 @@ class StyleTransferNone(ModelInterface):
         myglobal.get_logger().error("ERROR")
 
     def Parseconfig(self, json):
-        pass
-
-    def _ParseParams(self, params):
         pass
 
     def Eval(self, params):

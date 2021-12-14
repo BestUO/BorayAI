@@ -15,7 +15,7 @@ def GetModel(usegpu, args):
     return TransformerNet().to(device)
 
 
-def Eval(usegpu, model, contentsize, stylesize, params):
+def Eval(usegpu, model, contentsize, stylesize, param):
     global lastmodelpath
     with torch.no_grad():
         device = torch.device(
@@ -23,14 +23,14 @@ def Eval(usegpu, model, contentsize, stylesize, params):
         model.eval()
         content_tf = style_transform(contentsize)
         
-        for param in params:
-            contentpath, modelpath, resultpath = param
-            if lastmodelpath != modelpath:
-                model.load_state_dict(torch.load(modelpath, map_location=torch.device(device)))
-                lastmodelpath = modelpath
-            contentImg = content_tf(Image.open(str(contentpath))).to(device).unsqueeze(0)
-            output = denormalize(model(contentImg)).cpu()
-            save_image(output, resultpath)
+
+        contentpath, modelpath, resultpath = param
+        if lastmodelpath != modelpath:
+            model.load_state_dict(torch.load(modelpath, map_location=torch.device(device)))
+            lastmodelpath = modelpath
+        contentImg = content_tf(Image.open(str(contentpath))).to(device).unsqueeze(0)
+        output = denormalize(model(contentImg)).cpu()
+        save_image(output, resultpath)
 
 
 def style_transform(image_size=512):
