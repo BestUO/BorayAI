@@ -17,7 +17,7 @@
         "requestdir":"~/request",
         "responsedir":"~/response"
     },
-    "LogPath":"./logs/backend/",
+    "LogPath":"./log/",
     "Port":"7086",
     "GroupID":"work1",
     "BatchSize":16,
