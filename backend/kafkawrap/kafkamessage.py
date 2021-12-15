@@ -17,21 +17,23 @@ class kafkamodelwrap:
         return config["RequestTopic"], config["BootstrapServers"], config["GroupID"]
 
     def __CreateConsumer(self, functiontopics, group_id, bootstrap_servers):
+        # consumers =KafkaConsumer(group_id=group_id,
+        #                     bootstrap_servers=bootstrap_servers,
+        #                     value_deserializer=lambda m: json.loads(m.decode('ascii')),
+        #                     heartbeat_interval_ms=30)
         consumers =KafkaConsumer(group_id=group_id,
                             bootstrap_servers=bootstrap_servers,
-                            value_deserializer=lambda m: json.loads(m.decode('ascii')),
                             heartbeat_interval_ms=30)
-        # consumers =KafkaConsumer(group_id=group_id,
-        #                     bootstrap_servers=bootstrap_servers)
         consumers.subscribe(functiontopics)
         return consumers
 
     def __CreateProducer(self, kafkaservers):
-        producer = KafkaProducer(bootstrap_servers=kafkaservers,value_serializer=lambda v: json.dumps(v).encode("ascii"))
+        # producer = KafkaProducer(bootstrap_servers=kafkaservers,value_serializer=lambda v: json.dumps(v).encode("ascii"))
+        producer = KafkaProducer(bootstrap_servers=kafkaservers)
         return producer
 
     def PutMessage(self, topic, message):
-        future = self.producers.send(topic, message)
+        future = self.producers.send(topic, message.encode())
 
         # Block for 'synchronous' sends
         try:
@@ -55,8 +57,8 @@ class kafkamodelwrap:
         for message in self.consumers:
             myglobal.get_logger().info("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
                                                 message.offset, message.key,
-                                                message.value))
-            self.__DealWithMessage([message.value], cbfun)
+                                                message.value.decode()))
+            self.__DealWithMessage([message.value.decode()], cbfun)
 
 if __name__ == "__main__":
     pass

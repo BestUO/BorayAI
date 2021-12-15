@@ -19,7 +19,7 @@ def main():
     logformat = "%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s"
 
     formatter = logging.Formatter(logformat)
-    log_file_handler = TimedRotatingFileHandler(filename=logfilename, when="D", interval=1, backupCount=30)
+    log_file_handler = TimedRotatingFileHandler(filename=logfilename, when="midnight", interval=1, backupCount=30)
     # log_file_handler.suffix = "%Y-%m-%d_%H-%M.log"
     # log_file_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}.log$")
     log_file_handler.setFormatter(formatter)
@@ -46,9 +46,9 @@ def main():
     # kafka.PutMessage(
     #     "StyleTransfer-Fast",
     #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle1_047094002209")
-    # kafka.PutMessage(
-    #     "TextToSpeech",
-    #     "uuid_TextToSpeech_have a good day:en:0_047094002209")
+    kafka.PutMessage(
+        "TextToSpeech",
+        "uuid_TextToSpeech_中午吃饭叫上我:zh:0_047094002209")
     # kafka.PutMessage(
     #     "Translate",
     #     "uuid_Translate_今天是个好天气_047094002209")

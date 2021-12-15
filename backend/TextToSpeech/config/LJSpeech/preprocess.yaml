@@ -4,7 +4,7 @@ path:
   corpus_path: "/home/uncleorange/myssd/LJSpeech-1.1"
   lexicon_path: "lexicon/librispeech-lexicon.txt"
   raw_path: "/home/uncleorange/myssd/raw_data/LJSpeech"
-  preprocessed_path: "/home/uncleorange/mydevice/nlp/data/TTS/preprocessed_data/LJSpeech"
+  preprocessed_path: "./TextToSpeech/preprocessed_data/LJSpeech"
 
 preprocessing:
   val_size: 512
