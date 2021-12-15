@@ -13,8 +13,8 @@ class FTPWrap():
             config["FTPConfig"]["passwd"], config["FTPConfig"]["requestdir"], config["FTPConfig"]["responsedir"]
         self.ftp = FTP(host=host, user=user, passwd=passwd)
         self.ftp.set_pasv(False)
-        self.localrequestdir = config["LocalRequestDir"]
-        self.localresponsedir = config["LocalResponseDir"]
+        self.localrequestdir = Path(config["LocalRequestDir"])
+        self.localresponsedir = Path(config["LocalResponseDir"])
 
     def __del__(self):
         self.ftp.quit()
@@ -30,28 +30,26 @@ class FTPWrap():
             self.__DownLoadTranslate__(modelparams)
 
     def __DownLoadWCTAdaIN__(self, modelparams):
-        content, style, alpha = modelparams
-        content = content.replace(self.localrequestdir,"")
-        style = style.replace(self.localrequestdir,"")
-        contentfilepath = Path(self.localrequestdir).joinpath(content)
-        stylefilepath = Path(self.localrequestdir).joinpath(style)
-        os.makedirs(contentfilepath.parent, exist_ok=True)
+        contentfilepath, stylefilepath, alpha = modelparams
+        content = Path(contentfilepath).relative_to(self.localrequestdir)
+        style = Path(stylefilepath).relative_to(self.localrequestdir)
+
+        os.makedirs(Path(contentfilepath).parent, exist_ok=True)
         
         self.ftp.cwd(self.requestdir)
         with open(contentfilepath,"wb") as fp:
-            self.ftp.retrbinary("RETR " + content, fp.write)
+            self.ftp.retrbinary("RETR " + str(content), fp.write)
         with open(stylefilepath,"wb") as fp:
-            self.ftp.retrbinary("RETR " + style, fp.write)
+            self.ftp.retrbinary("RETR " + str(style), fp.write)
 
     def __DownLoadFast__(self, modelparams):
-        content, style = modelparams
-        content = content.replace(self.localrequestdir,"")
-        contentfilepath = Path(self.localrequestdir).joinpath(content)
-        os.makedirs(contentfilepath.parent, exist_ok=True)
+        contentfilepath, _ = modelparams
+        content = Path(contentfilepath).relative_to(self.localrequestdir)
+        os.makedirs(Path(contentfilepath).parent, exist_ok=True)
         
         self.ftp.cwd(self.requestdir)
         with open(contentfilepath,"wb") as fp:
-            self.ftp.retrbinary("RETR " + content, fp.write)
+            self.ftp.retrbinary("RETR " + str(content), fp.write)
 
 
     def __DownLoadTextToSpeech__(self, modelparams):
@@ -67,7 +65,7 @@ class FTPWrap():
 
     def __UpLoadFile__(self, message):
         remoteresponsepath = message.split("_")[-1]
-        transferedfilepath = Path(self.localresponsedir).joinpath(remoteresponsepath)
+        transferedfilepath = self.localresponsedir.joinpath(remoteresponsepath)
         self.ftp.cwd(self.responsedir)
         dirandname = remoteresponsepath.split("/")
         for dir in dirandname[:-1]:

@@ -10,12 +10,12 @@ import os
 
 
 def main():
-    filename = "../config.json"
+    filename = "./config.json"
     with open(filename) as f:
         conf_json = json.load(f)
     if not os.path.exists(conf_json["LogPath"]):
         os.makedirs(conf_json["LogPath"])
-    logfilename = conf_json["LogPath"] + "BorayAI_Backend.log"
+    logfilename = conf_json["LogPath"] + "BorayAI_Aiecent.log"
     logformat = "%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s"
 
     formatter = logging.Formatter(logformat)
@@ -46,9 +46,9 @@ def main():
     # kafka.PutMessage(
     #     "StyleTransfer-Fast",
     #     "uuid_StyleTransfer-Fast_20211117/StyleTransfer-Fast/uuid-content.jpg:faststyle1_047094002209")
-    kafka.PutMessage(
-        "TextToSpeech",
-        "uuid_TextToSpeech_中午吃饭叫上我:zh:0_047094002209")
+    # kafka.PutMessage(
+    #     "TextToSpeech",
+    #     "uuid_TextToSpeech_中午吃饭叫上我:zh:0_047094002209")
     # kafka.PutMessage(
     #     "Translate",
     #     "uuid_Translate_今天是个好天气_047094002209")

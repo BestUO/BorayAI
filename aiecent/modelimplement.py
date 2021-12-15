@@ -14,7 +14,7 @@ class ModelInterface(ABC):
 
     def __init__(self, name):
         self.name = name
-        self.configfilename = "../config.json"
+        self.configfilename = "./config.json"
         with open(self.configfilename) as f:
             self.conf_json = json.load(f)
         self.usegpu = self.conf_json["UseGPU"]
@@ -55,7 +55,7 @@ class StyleTransferWCT(ModelInterface):
         p1, p2 = params
         p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stwct.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
-        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
 
 
 class StyleTransferAdaIN(ModelInterface):
@@ -76,7 +76,7 @@ class StyleTransferAdaIN(ModelInterface):
         p1, p2 = params
         p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stadain.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
-        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
 
 
 class StyleTransferFast(ModelInterface):
@@ -97,7 +97,7 @@ class StyleTransferFast(ModelInterface):
         p1, p2 = params
         p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stfast.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
-        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
 
 class FastSpeech(ModelInterface):
 
@@ -117,7 +117,7 @@ class FastSpeech(ModelInterface):
         p1, p2 = params
         p2 += [str(resultpath.joinpath(p1[1]+"-response.wav"))]
         tts.Eval(self.usegpu, self.model, p2)
-        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + p2[-1][len(self.conf_json["LocalResponseDir"]):]]
+        return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
 
 class Translate(ModelInterface):
 
