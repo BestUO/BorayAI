@@ -1,9 +1,6 @@
-import multiprocessing
-from time import sleep
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.errors import KafkaError
-import json
-import myglobal
+import logging
 
 class kafkamodelwrap:
 
@@ -40,22 +37,22 @@ class kafkamodelwrap:
             record_metadata = future.get(timeout=10)
         except KafkaError as e:
             # Decide what to do if produce request failed...
-            myglobal.get_logger().info(e)
+            logging.getLogger("aiecent").info(e)
             pass
 
         # Successful result returns assigned partition and offset
-        myglobal.get_logger().info("topic:{topic}\t partition:{partition} \t offset:{offset}".format(
+        logging.getLogger("aiecent").info("topic:{topic}\t partition:{partition} \t offset:{offset}".format(
             topic = record_metadata.topic, partition=record_metadata.partition, offset=record_metadata.offset))
+        logging.getLogger("aiecent").info("send message:"+message)
 
     def __DealWithMessage(self, messages, cbfun):
         res = cbfun(messages)
         for topic, message in res:
             self.PutMessage(topic, message)
-            myglobal.get_logger().info("send message:"+message)
 
     def GetMessage(self, cbfun, batchsize):
         for message in self.consumers:
-            myglobal.get_logger().info("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
+            logging.getLogger("aiecent").info("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
                                                 message.offset, message.key,
                                                 message.value.decode()))
             self.__DealWithMessage([message.value.decode()], cbfun)

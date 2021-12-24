@@ -42,19 +42,19 @@ class SimpleWrapKafka:
                 if msg is None:
                     break
                 elif msg.error():
-                    myglobal.get_logger().error("Consumer error: {}".format(msg.error()))
+                    logging.getLogger("aiecent").error("Consumer error: {}".format(msg.error()))
                     continue
                 else:
                     messages += [msg.value().decode('utf-8')]
                     batch -= 1
             if len(messages):
-                myglobal.get_logger().info("recv " + str(len(messages)) + " messages request:" + str(messages))
+                logging.getLogger("aiecent").info("recv " + str(len(messages)) + " messages request:" + str(messages))
                 res = cbfun(messages)
-                myglobal.get_logger().info("Done with model")
+                logging.getLogger("aiecent").info("Done with model")
                 for topic, message in res:
                     self.PutMessage(topic, message)
-                    myglobal.get_logger().info("send message:"+message)
-                myglobal.get_logger().info("send " + str(len(messages)) + " messages response")
+                    logging.getLogger("aiecent").info("send message:"+message)
+                logging.getLogger("aiecent").info("send " + str(len(messages)) + " messages response")
 
     def __CreateConsumer(self):
         c = Consumer({
@@ -81,6 +81,6 @@ class SimpleWrapKafka:
         """ Called once for each message produced to indicate delivery result.
         Triggered by poll() or flush(). """
         if err is not None:
-            myglobal.get_logger().error('Message delivery failed: {}'.format(err))
+            logging.getLogger("aiecent").error('Message delivery failed: {}'.format(err))
         else:
-            myglobal.get_logger().info('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
+            logging.getLogger("aiecent").info('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))

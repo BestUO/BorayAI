@@ -7,8 +7,8 @@ import HuggingFace.translate as translate
 import TextToSpeech.tts as tts
 import time
 import os
-import myglobal
 from pathlib import Path
+import logging
 
 class ModelInterface(ABC):
 
@@ -143,10 +143,10 @@ class StyleTransferNone(ModelInterface):
         super(StyleTransferNone, self).__init__(name)
 
     def _GetModel(self):
-        myglobal.get_logger().error("ERROR")
+        logging.getLogger("aiecent").error("ERROR cant find model")
 
     def Parseconfig(self, json):
         pass
 
     def Eval(self, params):
-        myglobal.get_logger().error("ERROR")
+        logging.getLogger("aiecent").error("ERROR cant find model")

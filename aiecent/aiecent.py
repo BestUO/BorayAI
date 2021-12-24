@@ -1,3 +1,4 @@
+from time import sleep
 import myglobal
 import json
 from kafkawrap.kafkamessage import kafkamodelwrap
@@ -5,7 +6,6 @@ from modelimplement import StyleTransferWCT
 import process
 import logging
 from logging.handlers import TimedRotatingFileHandler
-# import re
 import os
 
 
@@ -24,10 +24,10 @@ def main():
     # log_file_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}.log$")
     log_file_handler.setFormatter(formatter)
     logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger()
+    logger = logging.getLogger("aiecent")
     logger.addHandler(log_file_handler)
 
-    myglobal.set_logger(logger)
+    # myglobal.set_logger(logger)
     myglobal.set_model(StyleTransferWCT())
 
     ftp = process.FTPWrap(conf_json)
@@ -37,9 +37,9 @@ def main():
     kafka = kafkamodelwrap(conf_json)
 
     # for n in range(1):
-    # kafka.PutMessage(
-    #     "StyleTransfer-WCT",
-    #     "uuid_StyleTransfer-WCT_20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8_047094002209")
+    kafka.PutMessage(
+        "StyleTransfer-WCT",
+        "uuid_StyleTransfer-WCT_20211117/StyleTransfer-WCT/uuid-content.jpg:20211117/StyleTransfer-WCT/uuid-style.jpg:0.8_047094002209")
     # kafka.PutMessage(
     #     "StyleTransfer-AdaIN",
     #     "uuid_StyleTransfer-AdaIN_20211117/StyleTransfer-AdaIN/uuid-content.jpg:20211117/StyleTransfer-AdaIN/uuid-style.jpg:0.8_047094002209")

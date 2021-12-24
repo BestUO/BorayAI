@@ -1,6 +1,6 @@
 class Global_Test:
     model = ""
-    logger = ""
+    # logger = ""
 
 def set_model(model):
     Global_Test.model = model
@@ -8,11 +8,11 @@ def set_model(model):
 def get_model():
     return Global_Test.model
 
-def set_logger(logger):
-    Global_Test.logger = logger
+# def set_logger(logger):
+#     Global_Test.logger = logger
 
-def get_logger():
-    return Global_Test.logger
+# def get_logger():
+#     return Global_Test.logger
 
 
 class InParams:

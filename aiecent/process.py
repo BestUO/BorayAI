@@ -1,11 +1,11 @@
+import ftplib
 import modelimplement
-import myglobal
 from kafkawrap.kafkamessage import kafkamodelwrap
 from ftplib import FTP, error_perm
 from pathlib import Path
-import time
 import os
 import paramspreprocess
+import logging
 
 class FTPWrap():
     def __init__(self, config):
@@ -85,11 +85,13 @@ class Process:
         self.ftpwrap = ftpwrap
         self.config = config
 
-    def __FtpDownload__(self, *arg, **kwargs):
+    def __FtpDownload__(self, message, *arg, **kwargs):
         self.ftpwrap.DownLoadFile(*arg, **kwargs)
+        logging.getLogger("aiecent").info("download finish for message:" + message)
 
-    def __FtpUpload__(self, *arg, **kwargs):
-        return self.ftpwrap.UpLoadFile(*arg, **kwargs)
+    def __FtpUpload__(self, message, *arg, **kwargs):
+        logging.getLogger("aiecent").info("upload finish for message:" + message)
+        self.ftpwrap.UpLoadFile(*arg, **kwargs)
 
     # def DealWithMessage(self, messages):
     #     tasks = {}
@@ -132,13 +134,20 @@ class Process:
             try:
                 paramsprecheck = paramspreprocess.GetParamsPreProcesscls(self.config, message)
                 params = paramsprecheck.ParamsPreProcess()
-                self.__FtpDownload__(paramsprecheck.funname, params[1])
+
+                self.__FtpDownload__(message, paramsprecheck.funname, params[1])
+
                 model = self.__GetModelImpl(paramsprecheck.funname)
                 if(model.name != "None"):
                     res += [model.Eval(params)]
-                    self.__FtpUpload__(paramsprecheck.funname, res[-1][-1])
-            except ValueError:
+                    logging.getLogger("aiecent").info("model.Eval finish for message:"+message)
+                    
+                    self.__FtpUpload__(message, paramsprecheck.funname, res[-1][-1])
+
+            except (ValueError,AttributeError) as e:
                 res += [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
+            except ftplib.error_perm as e:
+                res += [[self.config["DefaultTopic"], "00000000_FTPDownloadErr: " + message]]
         return res
 
     def __GetModelImpl(self, funname):
