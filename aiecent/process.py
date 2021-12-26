@@ -1,17 +1,31 @@
-import ftplib
 import modelimplement
 from kafkawrap.kafkamessage import kafkamodelwrap
-from ftplib import FTP, error_perm
+from ftplib import FTP, error_perm, error_temp
 from pathlib import Path
 import os
 import paramspreprocess
 import logging
+import socket
 
-class FTPWrap():
+class BaseDecorator:
+    @classmethod
+    def ReconnnectIfTimeout(cls,fun):
+        def wrap(self,*arg,**kwargs):
+            try:
+                self.ftp.cwd(self.requestdir)
+            except(error_perm, error_temp) as e:
+                self.ftp.connect(host=self.host,timeout=120)
+                self.ftp.login(user=self.user, passwd=self.passwd)
+                self.ftp.set_pasv(False)
+            fun(self,*arg,**kwargs)
+        return wrap
+
+
+class FTPWrap(BaseDecorator):
     def __init__(self, config):
-        host, user, passwd, self.requestdir, self.responsedir = config["FTPConfig"]["host"], config["FTPConfig"]["user"], \
+        self.host, self.user, self.passwd, self.requestdir, self.responsedir = config["FTPConfig"]["host"], config["FTPConfig"]["user"], \
             config["FTPConfig"]["passwd"], config["FTPConfig"]["requestdir"], config["FTPConfig"]["responsedir"]
-        self.ftp = FTP(host=host, user=user, passwd=passwd)
+        self.ftp = FTP(host=self.host, user=self.user, passwd=self.passwd,timeout=120)
         self.ftp.set_pasv(False)
         self.localrequestdir = Path(config["LocalRequestDir"])
         self.localresponsedir = Path(config["LocalResponseDir"])
@@ -19,6 +33,7 @@ class FTPWrap():
     def __del__(self):
         self.ftp.quit()
 
+    @BaseDecorator.ReconnnectIfTimeout
     def DownLoadFile(self, funname, modelparams):
         if(funname == "StyleTransfer-WCT" or funname == "StyleTransfer-AdaIN"):
             self.__DownLoadWCTAdaIN__(modelparams)
@@ -51,13 +66,13 @@ class FTPWrap():
         with open(contentfilepath,"wb") as fp:
             self.ftp.retrbinary("RETR " + str(content), fp.write)
 
-
     def __DownLoadTextToSpeech__(self, modelparams):
         pass
 
     def __DownLoadTranslate__(self, modelparams):
         pass
 
+    @BaseDecorator.ReconnnectIfTimeout
     def UpLoadFile(self, funname, message):
         if(funname == "StyleTransfer-WCT" or funname == "StyleTransfer-AdaIN" 
             or funname == "StyleTransfer-Fast" or funname == "TextToSpeech"):
@@ -146,7 +161,7 @@ class Process:
 
             except (ValueError,AttributeError) as e:
                 res += [[self.config["DefaultTopic"], "00000000_errparams: " + message]]
-            except ftplib.error_perm as e:
+            except error_perm as e:
                 res += [[self.config["DefaultTopic"], "00000000_FTPDownloadErr: " + message]]
         return res
 
