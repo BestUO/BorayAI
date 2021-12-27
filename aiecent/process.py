@@ -88,10 +88,12 @@ class FTPWrap(BaseDecorator):
                 self.ftp.cwd(dir)
             except error_perm:
                 self.ftp.mkd(dir)
+                self.ftp.sendcmd("site chmod 755 {dir}".format(dir=dir))
                 self.ftp.cwd(dir)
              
         with open(transferedfilepath,"rb") as fp:
             self.ftp.storbinary("STOR " + dirandname[-1], fp)
+            self.ftp.sendcmd("site chmod 755 {filename}".format(filename=dirandname[-1]))
 
 class Process:
 
