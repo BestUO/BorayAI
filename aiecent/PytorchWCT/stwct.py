@@ -20,15 +20,12 @@ def Eval(usegpu, model, contentsize, stylesize, param):
         csF = torch.Tensor().to(device)
 
         contentpath, stylepath, alpha, resultpath = param
-        contentImg = content_tf(
-            Image.open(contentpath)).to(device).unsqueeze(0)
+        contentImg = content_tf(Image.open(contentpath)).to(device).unsqueeze(0)
         styleImg = style_tf(Image.open(stylepath)).to(device).unsqueeze(0)
-        output = StyleTransfer(model, float(alpha), contentImg, styleImg,
-                                csF)
+        output = StyleTransfer(model, float(alpha), contentImg, styleImg, csF)
 
         output = output.cpu()
         save_image(output, resultpath)
-
 
 def WCTTransform(size, crop=False):
     transform_list = []

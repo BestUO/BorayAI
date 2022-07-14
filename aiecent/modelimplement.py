@@ -39,7 +39,7 @@ class ModelInterface(ABC):
 
 class StyleTransferWCT(ModelInterface):
 
-    def __init__(self, name="StyleTransfer-WCT"):
+    def __init__(self, name="StyleTransfer_WCT"):
         super(StyleTransferWCT, self).__init__(name)
         self.config = self._Parseconfig(self.conf_json[name])
         self.model = self._GetModel()
@@ -57,10 +57,16 @@ class StyleTransferWCT(ModelInterface):
         stwct.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
 
+    def EvalBatch(self, evaltasks):
+        resultimgnames = []
+        for [sourceimgname,styleimgname,alpha,resultimgname] in evaltasks:
+            stwct.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], [sourceimgname,styleimgname,alpha,resultimgname])
+            resultimgnames += [resultimgname]
+        return resultimgnames
 
 class StyleTransferAdaIN(ModelInterface):
 
-    def __init__(self, name="StyleTransfer-AdaIN"):
+    def __init__(self, name="StyleTransfer_AdaIN"):
         super(StyleTransferAdaIN, self).__init__(name)
         self.config = self._Parseconfig(self.conf_json[name])
         self.model = self._GetModel()
@@ -78,10 +84,17 @@ class StyleTransferAdaIN(ModelInterface):
         stadain.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
 
+    def EvalBatch(self, evaltasks):
+        resultimgnames = []
+        for [sourceimgname,styleimgname,alpha,resultimgname] in evaltasks:
+            stadain.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], [sourceimgname,styleimgname,alpha,resultimgname])
+            resultimgnames += [resultimgname]
+        return resultimgnames
+
 
 class StyleTransferFast(ModelInterface):
 
-    def __init__(self, name="StyleTransfer-Fast"):
+    def __init__(self, name="StyleTransfer_Fast"):
         super(StyleTransferFast, self).__init__(name)
         self.config = self._Parseconfig(self.conf_json[name])
         self.model = self._GetModel()
@@ -98,6 +111,13 @@ class StyleTransferFast(ModelInterface):
         p2 += [str(resultpath.joinpath(p1[1]+"-response.jpg"))]
         stfast.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], p2)
         return [p1[0], p1[1] + "_{name}_".format(name=self.name) + str(Path(p2[-1]).relative_to(self.conf_json["LocalResponseDir"]))]
+
+    def EvalBatch(self, evaltasks):
+        resultimgnames = []
+        for [sourceimgname,modelpath,resultimgname] in evaltasks:
+            stfast.Eval(self.usegpu, self.model, self.conf_json["ContentSize"], self.conf_json["StyleSize"], [sourceimgname,modelpath,resultimgname])
+            resultimgnames += [resultimgname]
+        return resultimgnames
 
 class FastSpeech(ModelInterface):
 

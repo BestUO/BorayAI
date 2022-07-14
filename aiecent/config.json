@@ -17,16 +17,28 @@
         "requestdir":"~/request",
         "responsedir":"~/response"
     },
+    "RedisConfig":
+    {
+        "host":"124.223.100.95",
+        "port":"10000",
+        "passwd":"p@ssw0rd_UO",
+        "queuename":"StyleTransfer_Fast"
+    },
+    "HttpServer":
+    {
+        "host":"124.223.100.95",
+        "port":"9999"
+    },
     "LogPath":"./log/",
     "Port":"7086",
     "GroupID":"work1",
-    "BatchSize":16,
+    "BatchSize":2,
     "LocalRequestDir":"./data/request/",
     "LocalResponseDir":"./data/response/",
     "UseGPU":true,
     "ContentSize":512,
     "StyleSize":512,
-    "StyleTransfer-WCT":
+    "StyleTransfer_WCT":
     {
         "vgg1":"./models/wctmodels/wct_vgg_normalised_conv1_1.pth",
         "vgg2":"./models/wctmodels/wct_vgg_normalised_conv2_1.pth",
@@ -39,12 +51,12 @@
         "decoder4":"./models/wctmodels/wct_feature_invertor_conv4_1.pth",
         "decoder5":"./models/wctmodels/wct_feature_invertor_conv5_1.pth"
     },
-    "StyleTransfer-AdaIN":
+    "StyleTransfer_AdaIN":
     {
         "adain_vgg":"./models/adainmodels/adain_vgg.pth",
         "adain_decoder":"./models/adainmodels/adain_decoder.pth"
     },
-    "StyleTransfer-Fast":
+    "StyleTransfer_Fast":
     {
         "faststyle1":"./models/fnst/faststyle1.pth",
         "faststyle2":"./models/fnst/faststyle2.pth",
